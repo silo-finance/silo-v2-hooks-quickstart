@@ -8,6 +8,7 @@ import {GaugeHookReceiver} from "silo-core-v2/utils/hook-receivers/gauge/GaugeHo
 import {PartialLiquidation} from "silo-core-v2/utils/hook-receivers/liquidation/PartialLiquidation.sol";
 
 contract BoilerplateHook is GaugeHookReceiver, PartialLiquidation {
+    /// @dev this method is mandatory and it has to initialize inherited contracts
     function initialize(ISiloConfig _siloConfig, bytes calldata _data) external initializer override {
         // do not remove initialization lines, if you want fully compatible functionality
 
@@ -36,12 +37,15 @@ contract BoilerplateHook is GaugeHookReceiver, PartialLiquidation {
         (hooksBefore, hooksAfter) = _hookReceiverConfig(_silo);
 
         // your code here
+        // you can remove this method if you not using it in your hook
     }
 
     /// @inheritdoc IHookReceiver
     function beforeAction(address, uint256, bytes calldata) external {
         // Silo does not use it, replace revert with your code if you want to use before hook
         revert RequestNotSupported();
+
+        // you can remove this method if you not using it in your hook
     }
 
     /// @inheritdoc IHookReceiver
@@ -53,5 +57,6 @@ contract BoilerplateHook is GaugeHookReceiver, PartialLiquidation {
         GaugeHookReceiver.afterAction(_silo, _action, _inputAndOutput);
 
         // your code here
+        // you can remove this method if you not using it in your hook
     }
 }
