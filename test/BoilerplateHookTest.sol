@@ -8,20 +8,20 @@ import {Initializable} from "openzeppelin5/proxy/utils/Initializable.sol";
 import {ISiloConfig} from "silo-core-v2/interfaces/ISiloConfig.sol";
 import {IGaugeHookReceiver} from "silo-core-v2/interfaces/IGaugeHookReceiver.sol";
 
-import {FullyCompatibleHook} from "../contracts/FullyCompatibleHook.sol";
+import {BoilerplateHook} from "../contracts/BoilerplateHook.sol";
 
 /*
-forge test -vv --mc FullyCompatibleHookTest
+forge test -vv --mc BoilerplateHookTest
 */
-contract FullyCompatibleHookTest is Test {
-    FullyCompatibleHook public hook;
+contract BoilerplateHookTest is Test {
+    BoilerplateHook public hook;
 
     function setUp() public {
-        hook = new FullyCompatibleHook();
+        hook = new BoilerplateHook();
     }
 
     function test_initialize_once() public {
-        // hook is design to clone, consructor disabled initialization
+        // hook is design to be clonable, constructor disabled initialization
         vm.expectRevert(Initializable.InvalidInitialization.selector);
         hook.initialize(ISiloConfig(address(0)), "");
     }

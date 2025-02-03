@@ -7,16 +7,20 @@ import {BaseHookReceiver} from "silo-core-v2/utils/hook-receivers/_common/BaseHo
 import {GaugeHookReceiver} from "silo-core-v2/utils/hook-receivers/gauge/GaugeHookReceiver.sol";
 import {PartialLiquidation} from "silo-core-v2/utils/hook-receivers/liquidation/PartialLiquidation.sol";
 
-contract FullyCompatibleHook is GaugeHookReceiver, PartialLiquidation {
+contract BoilerplateHook is GaugeHookReceiver, PartialLiquidation {
     function initialize(ISiloConfig _siloConfig, bytes calldata _data) external initializer override {
         // do not remove initialization lines, if you want fully compatible functionality
 
-        // begin of initialization
+        // --begin of initialization--
         (address owner) = abi.decode(_data, (address));
 
+        // initialize hook with SiloConfig address.
+        // SiloConfig is the source of all information about Silo markets you are extending.
         BaseHookReceiver.__BaseHookReceiver_init(_siloConfig);
+
+        // initialize GaugeHookReceiver. Owner can set "gauge" aka incentives contract for a Silo retroactively.
         GaugeHookReceiver.__GaugeHookReceiver_init(owner);
-        // end of initialization
+        // --end of initialization--
 
 
         // put your code here, that will be executed on hook initialization
@@ -42,7 +46,8 @@ contract FullyCompatibleHook is GaugeHookReceiver, PartialLiquidation {
 
     /// @inheritdoc IHookReceiver
     function afterAction(address _silo, uint256 _action, bytes calldata _inputAndOutput)
-        public override(GaugeHookReceiver, IHookReceiver)
+        public
+        override(GaugeHookReceiver, IHookReceiver)
     {
         // do not remove this line if you want fully compatible functionality
         GaugeHookReceiver.afterAction(_silo, _action, _inputAndOutput);
