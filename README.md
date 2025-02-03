@@ -1,4 +1,4 @@
-# Silo V2 Hooks Playground
+# Silo V2 Hooks Quickstart
 
 ## Prepare local environment
 
@@ -7,10 +7,10 @@
 # https://book.getfoundry.sh/getting-started/installation
 
 # 2. Clone repository
-$ git clone https://github.com/silo-finance/silo-v2-hooks-playground.git
+$ git clone https://github.com/silo-finance/silo-v2-hooks-quickstart.git
 
 # 3. Open folder
-$ cd silo-v2-hooks-playground
+$ cd silo-v2-hooks-quickstart
 
 # 4. Initialize submodules
 $ git submodule update --init --recursive
