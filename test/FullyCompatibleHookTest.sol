@@ -3,6 +3,9 @@ pragma solidity ^0.8.10;
 
 import {Test} from "forge-std/Test.sol";
 
+import {Initializable} from "openzeppelin5/proxy/utils/Initializable.sol";
+
+import {ISiloConfig} from "silo-core-v2/interfaces/ISiloConfig.sol";
 import {IGaugeHookReceiver} from "silo-core-v2/interfaces/IGaugeHookReceiver.sol";
 
 import {FullyCompatibleHook} from "../contracts/FullyCompatibleHook.sol";
@@ -15,6 +18,12 @@ contract FullyCompatibleHookTest is Test {
 
     function setUp() public {
         hook = new FullyCompatibleHook();
+    }
+
+    function test_initialize_once() public {
+        // hook is design to clone, consructor disabled initialization
+        vm.expectRevert(Initializable.InvalidInitialization.selector);
+        hook.initialize(ISiloConfig(address(0)), "");
     }
 
     function test_hookReceiverConfig() public {

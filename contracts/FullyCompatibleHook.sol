@@ -8,9 +8,16 @@ import {GaugeHookReceiver} from "silo-core-v2/utils/hook-receivers/gauge/GaugeHo
 import {PartialLiquidation} from "silo-core-v2/utils/hook-receivers/liquidation/PartialLiquidation.sol";
 
 contract FullyCompatibleHook is GaugeHookReceiver, PartialLiquidation {
-    function initialize(ISiloConfig _siloConfig, bytes calldata _data) external override {
-        // do not remove this line if you want fully compatible functionality
-        _init(_siloConfig, _data);
+    function initialize(ISiloConfig _siloConfig, bytes calldata _data) external initializer override {
+        // do not remove initialization lines, if you want fully compatible functionality
+
+        // begin of initialization
+        (address owner) = abi.decode(_data, (address));
+
+        BaseHookReceiver.__BaseHookReceiver_init(_siloConfig);
+        GaugeHookReceiver.__GaugeHookReceiver_init(owner);
+        // end of initialization
+
 
         // put your code here, that will be executed on hook initialization
     }
@@ -41,12 +48,5 @@ contract FullyCompatibleHook is GaugeHookReceiver, PartialLiquidation {
         GaugeHookReceiver.afterAction(_silo, _action, _inputAndOutput);
 
         // your code here
-    }
-
-    function _init(ISiloConfig _siloConfig, bytes calldata _data) internal {
-        (address owner) = abi.decode(_data, (address));
-
-        BaseHookReceiver.__BaseHookReceiver_init(_siloConfig);
-        GaugeHookReceiver.__GaugeHookReceiver_init(owner);
     }
 }
