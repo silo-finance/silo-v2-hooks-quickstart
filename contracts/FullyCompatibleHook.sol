@@ -38,7 +38,7 @@ contract FullyCompatibleHook is GaugeHookReceiver, PartialLiquidation {
         public override(GaugeHookReceiver, IHookReceiver)
     {
         // do not remove this line if you want fully compatible functionality
-        super.afterAction(_silo, _action, _inputAndOutput);
+        GaugeHookReceiver.afterAction(_silo, _action, _inputAndOutput);
 
         // your code here
     }
