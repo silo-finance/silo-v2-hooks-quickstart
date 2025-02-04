@@ -34,11 +34,6 @@ contract NonBorrowableHookTest is Labels {
 
         siloConfig = ISiloConfig(0x062A36Bbe0306c2Fd7aecdf25843291fBAB96AD2);
 
-        /// @dev by default initialization of hook is disable by constructor,
-        /// so the only way to use hook is to clone it based on implementation
-        clonedHook = NonBorrowableHook(Clones.clone(address(new NonBorrowableHook())));
-        vm.label(address(clonedHook), "clonedHook");
-
         _setLabels(siloConfig);
     }
 
@@ -67,10 +62,7 @@ contract NonBorrowableHookTest is Labels {
 
         // user was able to borrow, but with non borrowable hook can't:
 
-        clonedHook.initialize(siloConfig, abi.encodePacked(address(this), ISilo(silo0).asset()));
-
-        _mockHookAddress(silo0);
-        ISilo(silo0).updateHooks();
+        _deployHookAndMockItForSilo(silo0);
 
         vm.expectRevert(NonBorrowableHook.NonBorrowableHook_CanNotBorrowThisAsset.selector);
         ISilo(silo0).borrowSameAsset(1, user, user);
@@ -78,7 +70,21 @@ contract NonBorrowableHookTest is Labels {
         vm.stopPrank();
     }
 
-    function _mockHookAddress(address _silo) public {
+    function _deployHookAndMockItForSilo(address _silo) public {
+        /// @dev by default initialization of hook is disable by constructor,
+        /// so the only way to use hook is to clone it based on implementation
+        clonedHook = NonBorrowableHook(Clones.clone(address(new NonBorrowableHook())));
+        vm.label(address(clonedHook), "clonedHook");
+
+        // NOTICE: do not use encodePacked
+        clonedHook.initialize(siloConfig, abi.encode(address(1), ISilo(_silo).asset()));
+
+        _mockHookAddress(_silo);
+
+        ISilo(_silo).updateHooks();
+    }
+
+    function _mockHookAddress(address _silo) internal {
         ISiloConfig.ConfigData memory config = siloConfig.getConfig(_silo);
         config.hookReceiver = address(clonedHook);
 
