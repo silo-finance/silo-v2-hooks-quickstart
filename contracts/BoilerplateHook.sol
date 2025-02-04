@@ -28,6 +28,7 @@ contract BoilerplateHook is GaugeHookReceiver, PartialLiquidation {
         // put your code here, that will be executed on hook initialization
     }
 
+    /// @inheritdoc IHookReceiver
     function hookReceiverConfig(address _silo)
         external
         view
