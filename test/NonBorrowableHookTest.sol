@@ -1,22 +1,28 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.10;
 
-import {Test} from "forge-std/Test.sol";
+import {IERC20} from "openzeppelin5/token/ERC20/IERC20.sol";
 
 import {ISiloConfig} from "silo-core-v2/interfaces/ISiloConfig.sol";
 import {ISilo} from "silo-core-v2/interfaces/ISilo.sol";
-import {IERC20Metadata} from "silo-core-v2/interfaces/IShareToken.sol";
+import {IShareToken, IERC20Metadata} from "silo-core-v2/interfaces/IShareToken.sol";
 import {IGaugeHookReceiver} from "silo-core-v2/interfaces/IGaugeHookReceiver.sol";
+import {ShareTokenLib} from "silo-core-v2/lib/ShareTokenLib.sol";
 
-import {CollectedErrors} from "../contracts/CollectedErrors.sol";
-import {OZErrors} from "../contracts/OZErrors.sol";
+import {CollectedErrors} from "../contracts/errors/CollectedErrors.sol";
+import {OZErrors} from "../contracts/errors/OZErrors.sol";
 
 import {NonBorrowableHook} from "../contracts/NonBorrowableHook.sol";
+import {Labels} from "./common/Labels.sol";
 
 /*
 forge test -vv --mc NonBorrowableHookTest
 */
-contract NonBorrowableHookTest is Test {
+contract NonBorrowableHookTest is Labels {
+    /// @dev see: gitmodules/silo-contracts-v2/silo-core/contracts/lib/ShareTokenLib.sol
+    /// keccak256(abi.encode(uint256(keccak256("silo.storage.ShareToken")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant _STORAGE_LOCATION = 0x01b0b3f9d6e360167e522fa2b18ba597ad7b2b35841fec7e1ca4dbb0adea1200;
+
     ISiloConfig public siloConfig;
 
     NonBorrowableHook public hook;
@@ -28,8 +34,11 @@ contract NonBorrowableHookTest is Test {
         siloConfig = ISiloConfig(0x062A36Bbe0306c2Fd7aecdf25843291fBAB96AD2);
         hook = new NonBorrowableHook();
 
-        _setLabels();
+        _setLabels(siloConfig);
     }
+
+    /// can I switch collateral?
+    /// can I transfer debt after select same silo
 
     /*
     forge test -vv --mt test_nonBorrowableHook_sameAsset
@@ -38,37 +47,48 @@ contract NonBorrowableHookTest is Test {
         address user = makeAddr("user");
         (address silo0, address silo1) = siloConfig.getSilos();
 
+        uint256 depositAmount = 20;
+
+        vm.startPrank(silo0);
+        IERC20(ISilo(silo0).asset()).transfer(user, depositAmount);
+        vm.stopPrank();
+
+
+        vm.startPrank(user);
+        IERC20(ISilo(silo0).asset()).approve(silo0, depositAmount);
+        ISilo(silo0).deposit(depositAmount, user);
 
         ISilo(silo0).borrowSameAsset(1, user, user);
 
-        // hook is design to be clonable, constructor disabled initialization
-//        vm.expectRevert(Initializable.InvalidInitialization.selector);
-//        hook.initialize(ISiloConfig(address(0)), "");
+        // user was able to borrow, but with non borrowable hook can't:
+
+        hook.initialize(siloConfig, abi.encodePacked(address(this), ISilo(silo0).asset()));
+
+        _mockHookAddress(silo0);
+        ISilo(silo0).updateHooks();
+
+        vm.expectRevert(NonBorrowableHook.NonBorrowableHook_CanNotBorrowThisAsset.selector);
+        ISilo(silo0).borrowSameAsset(1, user, user);
+
+        vm.stopPrank();
     }
 
-    function _mockHookAddress() public {
-        // siloConfig.
-    }
-
-    function _setLabels() internal virtual {
-        (address silo0, address silo1) = siloConfig.getSilos();
-        ISiloConfig.ConfigData memory config = siloConfig.getConfig(silo0);
-
-        _labels(silo0, "0");
-        _labels(silo1, "1");
-    }
-
-    function _labels(address _silo, string memory _i) internal virtual {
+    function _mockHookAddress(address _silo) public {
         ISiloConfig.ConfigData memory config = siloConfig.getConfig(_silo);
+        config.hookReceiver = address(hook);
 
-        vm.label(config.silo, string.concat("silo", _i));
-        vm.label(config.hookReceiver, string.concat("hookReceiver", _i));
-        vm.label(config.collateralShareToken, string.concat("collateralShareToken", _i));
-        vm.label(config.protectedShareToken, string.concat("protectedShareToken", _i));
-        vm.label(config.debtShareToken, string.concat("debtShareToken", _i));
-        vm.label(config.interestRateModel, string.concat("interestRateModel", _i));
-        vm.label(config.maxLtvOracle, string.concat("maxLtvOracle", _i));
-        vm.label(config.solvencyOracle, string.concat("solvencyOracle", _i));
-        vm.label(config.token, string.concat(IERC20Metadata(config.token).symbol(), _i));
+        vm.mockCall(
+            address(siloConfig),
+            abi.encodeWithSelector(ISiloConfig.getConfig.selector, _silo),
+            abi.encode(config)
+        );
+
+        _mockHookSetupStorage(_silo);
+    }
+
+    function _mockHookSetupStorage(address _silo) internal {
+        uint256 storageSlot = uint256(_STORAGE_LOCATION) + 2;
+        vm.store(_silo, bytes32(storageSlot), bytes32(uint256(uint160(address(hook)))));
+        emit log_named_address("changing storage for silo, for hookReceiver", address(hook));
     }
 }
