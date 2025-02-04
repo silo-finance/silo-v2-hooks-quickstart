@@ -24,7 +24,15 @@ $ git submodule update --init --recursive
 forge test
 ```
 
-### Initial steps to create this repository from scratch
+#### Custom errors definition
+
+You can regenerate custom error definitions for foundry but running:
+
+```shell
+python3 findCustomErrors.py ../gitmodules/silo-contracts-v2/silo-core/
+```
+
+## Initial steps to create this repository from scratch
 
 ```shell
 git submodule add --name silo-contracts-v2 https://github.com/silo-finance/silo-contracts-v2 gitmodules/silo-contracts-v2
