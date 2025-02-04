@@ -1,0 +1,3 @@
+forge-std/=gitmodules/forge-std/src/
+silo-foundry-utils/=gitmodules/silo-foundry-utils/contracts/
+silo-core-v2/=gitmodules/silo-contracts-v2/silo-core/contracts/
