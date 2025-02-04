@@ -7,9 +7,16 @@ import {IERC20Metadata} from "silo-core-v2/interfaces/IShareToken.sol";
 
 import {ISiloConfig} from "silo-core-v2/interfaces/ISiloConfig.sol";
 import {ISilo} from "silo-core-v2/interfaces/ISilo.sol";
+import {ArbitrumLib} from "./ArbitrumLib.sol";
 
 contract Labels is Test {
     function _setLabels(ISiloConfig _siloConfig) internal virtual {
+        vm.label(address(ArbitrumLib.SILO_DEPLOYER), "SILO_DEPLOYER");
+        vm.label(address(ArbitrumLib.INTEREST_RATE_MODEL_FACTORY), "INTEREST_RATE_MODEL_FACTORY");
+        vm.label(address(ArbitrumLib.CHAINLINK_ETH_USD_AGREGATOR), "CHAINLINK_ETH_USD_AGREGATOR");
+        vm.label(address(ArbitrumLib.WETH), "WETH");
+        vm.label(address(ArbitrumLib.USDC), "USDC");
+
         vm.label(address(_siloConfig), string.concat("siloConfig"));
 
         (address silo0, address silo1) = _siloConfig.getSilos();
