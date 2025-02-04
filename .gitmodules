@@ -1,6 +1,3 @@
-[submodule "forge-std"]
-	path = gitmodules/forge-std
-	url = https://github.com/foundry-rs/forge-std
 [submodule "silo-contracts-v2"]
 	path = gitmodules/silo-contracts-v2
 	url = https://github.com/silo-finance/silo-contracts-v2
