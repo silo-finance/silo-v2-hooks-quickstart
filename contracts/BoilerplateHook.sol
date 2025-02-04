@@ -59,6 +59,6 @@ contract BoilerplateHook is GaugeHookReceiver, PartialLiquidation {
         GaugeHookReceiver.afterAction(_silo, _action, _inputAndOutput);
 
         // your code here
-        // you can remove this method if you not using it in your hook
+        // you can remove this method if you are not using it in your hook
     }
 }
