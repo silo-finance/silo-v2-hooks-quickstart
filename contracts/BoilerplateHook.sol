@@ -39,7 +39,7 @@ contract BoilerplateHook is GaugeHookReceiver, PartialLiquidation {
         (hooksBefore, hooksAfter) = _hookReceiverConfig(_silo);
 
         // your code here
-        // you can remove this method if you not using it in your hook
+        // you can remove this method if you are not using it in your hook
     }
 
     /// @inheritdoc IHookReceiver
