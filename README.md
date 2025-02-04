@@ -21,7 +21,7 @@ $ git submodule update --init --recursive
 forge test
 ```
 
-## Init
+## Initial steps to create this repository from scratch
 
 ```shell
 git submodule add --name forge-std https://github.com/foundry-rs/forge-std gitmodules/forge-std
