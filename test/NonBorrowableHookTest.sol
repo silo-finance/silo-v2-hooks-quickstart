@@ -2,6 +2,7 @@
 pragma solidity ^0.8.10;
 
 import {IERC20} from "openzeppelin5/token/ERC20/IERC20.sol";
+import {Clones} from "openzeppelin5/proxy/Clones.sol";
 
 import {ISiloConfig} from "silo-core-v2/interfaces/ISiloConfig.sol";
 import {ISilo} from "silo-core-v2/interfaces/ISilo.sol";
@@ -25,14 +26,18 @@ contract NonBorrowableHookTest is Labels {
 
     ISiloConfig public siloConfig;
 
-    NonBorrowableHook public hook;
+    NonBorrowableHook public clonedHook;
 
     function setUp() public {
         uint256 blockToFork = 6512598;
         vm.createSelectFork(vm.envString("RPC_SONIC"), blockToFork);
 
         siloConfig = ISiloConfig(0x062A36Bbe0306c2Fd7aecdf25843291fBAB96AD2);
-        hook = new NonBorrowableHook();
+
+        /// @dev by default initialization of hook is disable by constructor,
+        /// so the only way to use hook is to clone it based on implementation
+        clonedHook = NonBorrowableHook(Clones.clone(address(new NonBorrowableHook())));
+        vm.label(address(clonedHook), "clonedHook");
 
         _setLabels(siloConfig);
     }
@@ -62,7 +67,7 @@ contract NonBorrowableHookTest is Labels {
 
         // user was able to borrow, but with non borrowable hook can't:
 
-        hook.initialize(siloConfig, abi.encodePacked(address(this), ISilo(silo0).asset()));
+        clonedHook.initialize(siloConfig, abi.encodePacked(address(this), ISilo(silo0).asset()));
 
         _mockHookAddress(silo0);
         ISilo(silo0).updateHooks();
@@ -75,7 +80,7 @@ contract NonBorrowableHookTest is Labels {
 
     function _mockHookAddress(address _silo) public {
         ISiloConfig.ConfigData memory config = siloConfig.getConfig(_silo);
-        config.hookReceiver = address(hook);
+        config.hookReceiver = address(clonedHook);
 
         vm.mockCall(
             address(siloConfig),
@@ -88,7 +93,7 @@ contract NonBorrowableHookTest is Labels {
 
     function _mockHookSetupStorage(address _silo) internal {
         uint256 storageSlot = uint256(_STORAGE_LOCATION) + 2;
-        vm.store(_silo, bytes32(storageSlot), bytes32(uint256(uint160(address(hook)))));
-        emit log_named_address("changing storage for silo, for hookReceiver", address(hook));
+        vm.store(_silo, bytes32(storageSlot), bytes32(uint256(uint160(address(clonedHook)))));
+        emit log_named_address("changing storage for silo, for hookReceiver", address(clonedHook));
     }
 }
