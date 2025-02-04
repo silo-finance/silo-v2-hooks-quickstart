@@ -35,23 +35,31 @@ def extract_custom_errors(file_path):
     return custom_errors
 
 
-def save_errors_to_solidity_file(errors, output_file):
+def save_errors_to_contract(errors, output_file):
     """
-    Save all collected errors to a single Solidity file.
+    Save all collected errors into a Solidity contract.
+    The contract name matches the output file name (excluding `.sol`).
     """
+    # Extract contract name from the output file name
+    contract_name = os.path.splitext(os.path.basename(output_file))[0]
+
     with open(output_file, "w") as file:
         # Add Solidity file header
         file.write("// SPDX-License-Identifier: UNLICENSED\n")
         file.write("pragma solidity ^0.8.10;\n\n")
-        file.write("// All collected custom errors\n")
+        file.write(f"// Contract containing all collected custom errors\n")
         file.write("/* This file is generated automatically */\n\n")
-        for error in sorted(errors):  # Sort errors to ensure consistent ordering
-            file.write(f"{error}\n")
+
+        # Write the contract interface
+        file.write(f"contract {contract_name} {{\n")
+        for error in sorted(errors):  # Sort errors for consistent ordering
+            file.write(f"    {error}\n")
+        file.write("}\n")  # Close the contract
 
 
 def main():
     """
-    Main function to collect and save custom errors.
+    Main function to collect errors and save them into a contract.
     """
     # Check for command-line arguments
     if len(sys.argv) < 3:
@@ -80,9 +88,9 @@ def main():
         errors = extract_custom_errors(solidity_file)
         all_errors.update(errors)  # Add new errors to the set
 
-    # Save unique errors to the provided output file
+    # Save unique errors to a contract
     if all_errors:
-        save_errors_to_solidity_file(all_errors, output_file_path)
+        save_errors_to_contract(all_errors, output_file_path)
         print(f"Custom errors collected and saved in: {output_file_path}")
     else:
         print("No custom errors found in the provided directory.")

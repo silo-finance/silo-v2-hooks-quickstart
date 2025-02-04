@@ -29,7 +29,14 @@ forge test
 You can regenerate custom error definitions for foundry but running:
 
 ```shell
-python3 findCustomErrors.py ../gitmodules/silo-contracts-v2/silo-core/
+cd custom 
+
+python3 findCustomErrors.py ../gitmodules/openzeppelin-contracts-5/contracts/ ../contracts/OZErrors.sol
+python3 findCustomErrors.py ../gitmodules/silo-contracts-v2/silo-core/ ../contracts/CollectedErrors.sol
+
+you want to adjust output files:
+- remove errors with custom types 
+- or include path to custom types definitions
 ```
 
 ## Initial steps to create this repository from scratch
@@ -43,3 +50,13 @@ forge update
 cd gitmodules/silo-contracts-v2
 git checkout <commit>
 ```
+
+
+# Remove the submodule entry from .git/config
+git submodule deinit -f gitmodules/forge-std
+
+# Remove the submodule directory from the super project's .git/modules directory
+rm -rf .git/modules/gitmodules/forge-std
+
+# Remove the entry in .gitmodules and remove the submodule directory located at path/to/submodule
+rm -rf .git/modules/gitmodules/forge-std

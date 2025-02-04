@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.10;
 
-// All collected custom errors
+// Contract containing all collected custom errors
 /* This file is generated automatically */
 
 contract CollectedErrors {
