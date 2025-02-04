@@ -37,35 +37,31 @@ contract NonBorrowableHookTest is Labels {
         _setLabels(siloConfig);
     }
 
-    /// can I switch collateral?
-    /// can I transfer debt after select same silo
-
     /*
-    forge test -vv --mt test_nonBorrowableHook_sameAsset
+    forge test -vv --mt test_nonBorrowableHook
     */
-    function test_nonBorrowableHook_sameAsset() public {
+    function test_nonBorrowableHook() public {
         address user = makeAddr("user");
         (address silo0, address silo1) = siloConfig.getSilos();
 
-        uint256 depositAmount = 20;
+        uint256 depositAmount = 1e18;
 
         vm.startPrank(silo0);
         IERC20(ISilo(silo0).asset()).transfer(user, depositAmount);
         vm.stopPrank();
 
-
         vm.startPrank(user);
         IERC20(ISilo(silo0).asset()).approve(silo0, depositAmount);
         ISilo(silo0).deposit(depositAmount, user);
 
-        ISilo(silo0).borrowSameAsset(1, user, user);
+        ISilo(silo1).borrow(1, user, user);
 
         // user was able to borrow, but with non borrowable hook can't:
 
-        _deployHookAndMockItForSilo(silo0);
+        _deployHookAndMockItForSilo(silo1);
 
         vm.expectRevert(NonBorrowableHook.NonBorrowableHook_CanNotBorrowThisAsset.selector);
-        ISilo(silo0).borrowSameAsset(1, user, user);
+        ISilo(silo1).borrow(1, user, user);
 
         vm.stopPrank();
     }
