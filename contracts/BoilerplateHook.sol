@@ -9,6 +9,7 @@ import {PartialLiquidation} from "silo-core-v2/utils/hook-receivers/liquidation/
 
 contract BoilerplateHook is GaugeHookReceiver, PartialLiquidation {
     /// @dev this method is mandatory and it has to initialize inherited contracts
+    /// @inheritdoc IHookReceiver
     function initialize(ISiloConfig _siloConfig, bytes calldata _data) external initializer override {
         // do not remove initialization lines, if you want fully compatible functionality
 
