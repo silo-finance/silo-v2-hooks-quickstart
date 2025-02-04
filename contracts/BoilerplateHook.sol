@@ -47,7 +47,7 @@ contract BoilerplateHook is GaugeHookReceiver, PartialLiquidation {
         // Silo does not use it, replace revert with your code if you want to use before hook
         revert RequestNotSupported();
 
-        // you can remove this method if you not using it in your hook
+        // you can remove this method if you are not using it in your hook
     }
 
     /// @inheritdoc IHookReceiver
