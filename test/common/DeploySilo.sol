@@ -14,11 +14,43 @@ import {IInterestRateModelV2Factory} from "silo-core-v2/interfaces/IInterestRate
 import {ChainlinkV3OracleFactory} from "silo-oracles-v2/chainlinkV3/ChainlinkV3OracleFactory.sol";
 import {IChainlinkV3Oracle, AggregatorV3Interface} from "silo-oracles-v2/interfaces/IChainlinkV3Oracle.sol";
 import {SiloDeployer} from "silo-core-v2/SiloDeployer.sol";
+import {SiloFactory} from "silo-core-v2/SiloFactory.sol";
 
 import {ArbitrumLib} from "./ArbitrumLib.sol";
 
 contract DeploySilo {
     /// @dev chainlink oracle on arbitrum
+
+//    function deploySilo(
+//        SiloDeployer _siloDeployer,
+//        address _hook
+//    ) public returns (ISiloConfig siloConfig) {
+//        SiloFactory factory = new SiloFactory(address(this));
+//
+//        factory.createSilo(
+//            _siloInitData(),
+//            siloConfig,
+//            SILO_IMPL,
+//            SHARE_PROTECTED_COLLATERAL_TOKEN_IMPL,
+//            SHARE_DEBT_TOKEN_IMPL
+//        );
+//        // initialize hook receiver only if it was cloned
+//        _initializeHookReceiver(_siloInitData, siloConfig, _clonableHookReceiver);
+//
+//
+//        // this is empty because deploying hook is handeled manually and final address is pass as argument
+//        ISiloDeployer.ClonableHookReceiver memory _clonableHookReceiver;
+//
+//        siloConfig = _siloDeployer.deploy({
+//            _oracles: _oracles(),
+//            _irmConfigData0: _irmConfigData(),
+//            _irmConfigData1: _irmConfigData(),
+//            _clonableHookReceiver: _clonableHookReceiver,
+//            _siloInitData: _siloInitData(_hook)
+//        });
+//
+//        console.log("_siloDeployer.deploy end");
+//    }
 
     function deploySilo(
         SiloDeployer _siloDeployer,
@@ -39,9 +71,10 @@ contract DeploySilo {
     }
 
     function _oracles() internal returns (ISiloDeployer.Oracles memory oracles) {
-        // this setup must match _siloInitData() setup,
-        // oracles.maxLtvOracle1.deployed = /* use already deployed oracle */;
-        oracles.maxLtvOracle1.factory = address(new ChainlinkV3OracleFactory());
+        // Silo has two options to set oracles: for max LTV and solvency
+        // if you want to set the same for both, set for solvency, it will be copied for maxLTV as well
+        // if you set only for maxLtvOracle it will throw error
+        oracles.solvencyOracle1.factory = address(new ChainlinkV3OracleFactory());
 
         IChainlinkV3Oracle.ChainlinkV3DeploymentConfig memory config;
         config.baseToken = IERC20Metadata(ArbitrumLib.WETH);
@@ -50,7 +83,7 @@ contract DeploySilo {
         config.primaryHeartbeat = 87001;
         config.normalizationMultiplier = 1e10;
 
-        oracles.maxLtvOracle1.txInput = abi.encodeWithSelector(ChainlinkV3OracleFactory.create.selector, config);
+        oracles.solvencyOracle1.txInput = abi.encodeWithSelector(ChainlinkV3OracleFactory.create.selector, config);
 
         console.log("_oracles setup end");
     }
@@ -86,7 +119,7 @@ contract DeploySilo {
 
         siloInitData.token1 = ArbitrumLib.USDC;
         //
-        siloInitData.solvencyOracle1 = ArbitrumLib.CHAINLINK_ETH_USD;
+//        siloInitData.solvencyOracle1 = address(123);
 
         (, irm) = ArbitrumLib.INTEREST_RATE_MODEL_FACTORY.create(_irmConfigData());
 
