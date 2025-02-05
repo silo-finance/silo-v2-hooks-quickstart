@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.28;
 
-import {console2} from "forge-std/console2.sol";
-
 import {IHookReceiver} from "silo-core-v2/interfaces/IHookReceiver.sol";
 import {ISiloConfig} from "silo-core-v2/interfaces/ISiloConfig.sol";
 import {ISilo} from "silo-core-v2/interfaces/ISilo.sol";
