@@ -117,9 +117,8 @@ contract NonBorrowableHookArbitrumTest is Labels {
     }
 
     function _getUSDC(address _user, uint256 _amount) internal {
-        vm.startPrank(ArbitrumLib.USDC_WHALE);
+        vm.prank(ArbitrumLib.USDC_WHALE);
         IERC20(ArbitrumLib.USDC).transfer(_user, _amount);
-        vm.stopPrank();
     }
 
     function _getWETH(address _user, uint256 _amount) internal {
