@@ -7,7 +7,6 @@ import {Clones} from "openzeppelin5/proxy/Clones.sol";
 import {ISiloConfig} from "silo-core-v2/interfaces/ISiloConfig.sol";
 import {ISilo} from "silo-core-v2/interfaces/ISilo.sol";
 import {IShareToken, IERC20Metadata} from "silo-core-v2/interfaces/IShareToken.sol";
-import {IGaugeHookReceiver} from "silo-core-v2/interfaces/IGaugeHookReceiver.sol";
 
 import {SiloDeployer} from "silo-core-v2/SiloDeployer.sol";
 
