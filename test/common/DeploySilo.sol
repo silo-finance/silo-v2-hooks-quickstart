@@ -19,39 +19,6 @@ import {SiloFactory} from "silo-core-v2/SiloFactory.sol";
 import {ArbitrumLib} from "./ArbitrumLib.sol";
 
 contract DeploySilo {
-    /// @dev chainlink oracle on arbitrum
-
-//    function deploySilo(
-//        SiloDeployer _siloDeployer,
-//        address _hook
-//    ) public returns (ISiloConfig siloConfig) {
-//        SiloFactory factory = new SiloFactory(address(this));
-//
-//        factory.createSilo(
-//            _siloInitData(),
-//            siloConfig,
-//            SILO_IMPL,
-//            SHARE_PROTECTED_COLLATERAL_TOKEN_IMPL,
-//            SHARE_DEBT_TOKEN_IMPL
-//        );
-//        // initialize hook receiver only if it was cloned
-//        _initializeHookReceiver(_siloInitData, siloConfig, _clonableHookReceiver);
-//
-//
-//        // this is empty because deploying hook is handeled manually and final address is pass as argument
-//        ISiloDeployer.ClonableHookReceiver memory _clonableHookReceiver;
-//
-//        siloConfig = _siloDeployer.deploy({
-//            _oracles: _oracles(),
-//            _irmConfigData0: _irmConfigData(),
-//            _irmConfigData1: _irmConfigData(),
-//            _clonableHookReceiver: _clonableHookReceiver,
-//            _siloInitData: _siloInitData(_hook)
-//        });
-//
-//        console.log("_siloDeployer.deploy end");
-//    }
-
     function deploySilo(
         SiloDeployer _siloDeployer,
         address _hook
@@ -74,6 +41,7 @@ contract DeploySilo {
         // Silo has two options to set oracles: for max LTV and solvency
         // if you want to set the same for both, set for solvency, it will be copied for maxLTV as well
         // if you set only for maxLtvOracle it will throw error
+        // if you already have oracles deployed, you can set it directly in _irmConfigData()
         oracles.solvencyOracle1.factory = address(new ChainlinkV3OracleFactory());
 
         IChainlinkV3Oracle.ChainlinkV3DeploymentConfig memory config;
@@ -107,8 +75,6 @@ contract DeploySilo {
         siloInitData.daoFee = 0.1e18;
 
         siloInitData.token0 = ArbitrumLib.WETH;
-        //
-        siloInitData.solvencyOracle0;
         (, IInterestRateModelV2 irm) = ArbitrumLib.INTEREST_RATE_MODEL_FACTORY.create(_irmConfigData());
 
         siloInitData.interestRateModel0 = address(irm);
@@ -118,9 +84,6 @@ contract DeploySilo {
         siloInitData.liquidationFee0 = 0.075e18;
 
         siloInitData.token1 = ArbitrumLib.USDC;
-        //
-//        siloInitData.solvencyOracle1 = address(123);
-
         (, irm) = ArbitrumLib.INTEREST_RATE_MODEL_FACTORY.create(_irmConfigData());
 
         siloInitData.interestRateModel1 = address(irm);

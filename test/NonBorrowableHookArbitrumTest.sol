@@ -30,7 +30,7 @@ contract NonBorrowableHookArbitrumTest is Labels {
 
     NonBorrowableHook public clonedHook;
 
-    function _setUp() public {
+    function setUp() public {
         uint256 blockToFork = 302603188;
         vm.createSelectFork(vm.envString("RPC_ARBITRUM"), blockToFork);
 
@@ -46,30 +46,85 @@ contract NonBorrowableHookArbitrumTest is Labels {
     }
 
     /*
-    forge test --mt test_nonBorrowableHook -vv
+    forge test --mt test_nonBorrowableHook_twoAssets -vv
     */
-    function test_nonBorrowableHook() public {
-        _setUp();
-
+    function test_nonBorrowableHook_USDC() public {
         address user = makeAddr("user");
-        (address silo0, address silo1) = siloConfig.getSilos();
+        (address wethSilo, address usdcSilo) = siloConfig.getSilos();
 
         uint256 depositAmount = 1e18;
 
-        vm.startPrank(silo0);
-        IERC20(ISilo(silo0).asset()).transfer(user, depositAmount);
+        vm.startPrank(ArbitrumLib.WETH_WHALE);
+        IERC20(ISilo(wethSilo).asset()).transfer(user, depositAmount);
         vm.stopPrank();
 
         vm.startPrank(user);
-        IERC20(ISilo(silo0).asset()).approve(silo0, depositAmount);
-        ISilo(silo0).deposit(depositAmount, user);
-
-        ISilo(silo1).borrow(1, user, user);
-
-        // user was able to borrow, but with non borrowable hook can't:
+        IERC20(ISilo(wethSilo).asset()).approve(wethSilo, depositAmount);
+        ISilo(wethSilo).deposit(depositAmount, user);
 
         vm.expectRevert(NonBorrowableHook.NonBorrowableHook_CanNotBorrowThisAsset.selector);
-        ISilo(silo1).borrow(1, user, user);
+        ISilo(usdcSilo).borrow(1, user, user);
+
+        vm.stopPrank();
+    }
+
+    /*
+    forge test --mt test_nonBorrowableHook_twoAssets -vv
+    */
+    function test_nonBorrowableHook_WETH() public {
+        address user = makeAddr("user");
+        (address wethSilo, address usdcSilo) = siloConfig.getSilos();
+
+        uint256 depositAmount = 1e18;
+
+        vm.startPrank(ArbitrumLib.USDC_WHALE);
+        IERC20(ISilo(usdcSilo).asset()).transfer(user, depositAmount);
+        vm.stopPrank();
+
+        vm.startPrank(user);
+        IERC20(ISilo(usdcSilo).asset()).approve(usdcSilo, depositAmount);
+        ISilo(usdcSilo).deposit(depositAmount, user);
+
+        ISilo(wethSilo).borrow(1, user, user);
+
+        vm.stopPrank();
+    }
+
+    /*
+    forge test --mt test_nonBorrowableHook_sameAsset -vv
+    */
+    function test_nonBorrowableHook_sameAsset0() public {
+        address user = makeAddr("user");
+        (address silo0,) = siloConfig.getSilos();
+
+        vm.startPrank(ArbitrumLib.WETH_WHALE);
+        IERC20(ISilo(silo0).asset()).transfer(user, 1e18);
+        vm.stopPrank();
+
+        _nonBorrowableHook_sameAsset(silo0);
+    }
+
+    function test_nonBorrowableHook_sameAsset1() public {
+        address user = makeAddr("user");
+        (, address silo1) = siloConfig.getSilos();
+
+        vm.startPrank(ArbitrumLib.USDC_WHALE);
+        IERC20(ISilo(silo1).asset()).transfer(user, 1e6);
+        vm.stopPrank();
+
+        _nonBorrowableHook_sameAsset(silo1);
+    }
+
+    function _nonBorrowableHook_sameAsset(address _silo) public {
+        address user = makeAddr("user");
+
+        uint256 depositAmount = IERC20(ISilo(_silo).asset()).balanceOf(user);
+
+        vm.startPrank(user);
+        IERC20(ISilo(_silo).asset()).approve(_silo, depositAmount);
+        ISilo(_silo).deposit(depositAmount, user);
+
+        ISilo(_silo).borrowSameAsset(1, user, user);
 
         vm.stopPrank();
     }
