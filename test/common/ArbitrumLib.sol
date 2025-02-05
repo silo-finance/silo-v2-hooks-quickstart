@@ -8,9 +8,6 @@ import {SiloDeployer} from "silo-core-v2/SiloDeployer.sol";
 library ArbitrumLib {
     SiloDeployer constant SILO_DEPLOYER = SiloDeployer(0xB30Ee27f6e19A24Df12dba5Ab4124B6dCE9beeE5);
 
-    IInterestRateModelV2Factory constant INTEREST_RATE_MODEL_FACTORY =
-        IInterestRateModelV2Factory(0xCce964AAb03Ca650ADF6F0496A30b1Ef0a29bd69);
-
     address constant CHAINLINK_ETH_USD_AGREGATOR = 0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612;
     address constant CHAINLINK_ETH_USD = 0xed4399235f377AFB48dA005607a0F52Ed7C3bC7F;
 

@@ -12,7 +12,6 @@ import {ArbitrumLib} from "./ArbitrumLib.sol";
 contract Labels is Test {
     function _setLabels(ISiloConfig _siloConfig) internal virtual {
         vm.label(address(ArbitrumLib.SILO_DEPLOYER), "SILO_DEPLOYER");
-        vm.label(address(ArbitrumLib.INTEREST_RATE_MODEL_FACTORY), "INTEREST_RATE_MODEL_FACTORY");
         vm.label(address(ArbitrumLib.CHAINLINK_ETH_USD_AGREGATOR), "CHAINLINK_ETH_USD_AGREGATOR");
         vm.label(address(ArbitrumLib.WETH), "WETH");
         vm.label(address(ArbitrumLib.USDC), "USDC");
