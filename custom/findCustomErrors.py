@@ -46,7 +46,7 @@ def save_errors_to_contract(errors, output_file):
     with open(output_file, "w") as file:
         # Add Solidity file header
         file.write("// SPDX-License-Identifier: UNLICENSED\n")
-        file.write("pragma solidity ^0.8.10;\n\n")
+        file.write("pragma solidity ^0.8.28;\n\n")
         file.write(f"// Contract containing all collected custom errors\n")
         file.write("/* This file is generated automatically */\n\n")
 
