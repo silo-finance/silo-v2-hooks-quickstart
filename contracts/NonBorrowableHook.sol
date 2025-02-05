@@ -38,9 +38,12 @@ contract NonBorrowableHook is GaugeHookReceiver, PartialLiquidation {
 
         (address silo0, address silo1) = _siloConfig.getSilos();
 
-        if (ISilo(silo0).asset() == nonBorrowableAsset) nonBorrowableSilo = silo0;
-        else if (ISilo(silo1).asset() == nonBorrowableAsset) nonBorrowableSilo = silo1;
-        else revert NonBorrowableHook_WrongAssetForMarket();
+        if (ISilo(silo0).asset() == nonBorrowableAsset)
+            nonBorrowableSilo = silo0;
+        else if (ISilo(silo1).asset() == nonBorrowableAsset)
+            nonBorrowableSilo = silo1;
+        else
+            revert NonBorrowableHook_WrongAssetForMarket();
     }
 
     function hookReceiverConfig(address _silo)
