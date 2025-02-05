@@ -21,8 +21,6 @@ contract NonBorrowableHook is GaugeHookReceiver, PartialLiquidation {
     /// @dev this method is mandatory and it has to initialize inherited contracts
     function initialize(ISiloConfig _siloConfig, bytes calldata _data) external initializer override {
         // do not remove initialization lines, if you want fully compatible functionality
-
-        // --begin of initialization--
         (address owner, address nonBorrowableAsset) = abi.decode(_data, (address, address));
 
         // initialize hook with SiloConfig address.
@@ -31,7 +29,6 @@ contract NonBorrowableHook is GaugeHookReceiver, PartialLiquidation {
 
         // initialize GaugeHookReceiver. Owner can set "gauge" aka incentives contract for a Silo retroactively.
         GaugeHookReceiver.__GaugeHookReceiver_init(owner);
-        // --end of initialization--
 
         __NonBorrowableHook_init(_siloConfig, nonBorrowableAsset);
     }
