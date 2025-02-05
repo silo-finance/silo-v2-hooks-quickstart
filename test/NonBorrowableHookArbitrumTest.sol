@@ -34,7 +34,7 @@ contract NonBorrowableHookArbitrumTest is Labels {
         siloConfig = deployer.deploySilo(
             ArbitrumLib.SILO_DEPLOYER,
             address(new NonBorrowableHook()),
-            // NOTICE: do not use encodePacked
+            // NOTICE: do not use encodePacked, as the hook will not be able to decode this data with abi.decode
             abi.encode(address(this), ArbitrumLib.USDC)
         );
 
