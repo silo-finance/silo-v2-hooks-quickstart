@@ -140,7 +140,7 @@ contract NonBorrowableHookArbitrumTest is Labels {
         vm.stopPrank();
     }
 
-    function _getHookAddress(ISiloConfig _siloConfig) internal returns (address hook) {
+    function _getHookAddress(ISiloConfig _siloConfig) internal view returns (address hook) {
         (address silo, ) = _siloConfig.getSilos();
 
         ISiloConfig.ConfigData memory config = _siloConfig.getConfig(silo);

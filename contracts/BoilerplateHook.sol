@@ -57,7 +57,7 @@ contract BoilerplateHook is GaugeHookReceiver, PartialLiquidation {
     }
 
     /// @inheritdoc IHookReceiver
-    function beforeAction(address, uint256, bytes calldata) external {
+    function beforeAction(address, uint256, bytes calldata) external pure {
         // Silo does not use it, replace revert with your code if you want to use before hook
         revert RequestNotSupported();
 
