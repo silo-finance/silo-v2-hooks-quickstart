@@ -138,7 +138,6 @@ contract NonBorrowableHookArbitrumTest is Labels {
     function _getHookAddress(ISiloConfig _siloConfig) internal view returns (address hook) {
         (address silo, ) = _siloConfig.getSilos();
 
-        ISiloConfig.ConfigData memory config = _siloConfig.getConfig(silo);
-        hook = config.hookReceiver;
+        hook = _siloConfig.getConfig(silo).hookReceiver;
     }
 }
