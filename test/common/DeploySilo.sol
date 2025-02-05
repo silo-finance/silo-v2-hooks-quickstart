@@ -1,20 +1,15 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.10;
 
-import {console} from "forge-std/console.sol";
-
-
 import {IERC20Metadata} from "openzeppelin5/token/ERC20/extensions/IERC20Metadata.sol";
 
 import {ISiloConfig} from "silo-core-v2/interfaces/ISiloConfig.sol";
 import {ISiloDeployer} from "silo-core-v2/interfaces/ISiloDeployer.sol";
 import {IInterestRateModelV2} from "silo-core-v2/interfaces/IInterestRateModelV2.sol";
-import {IInterestRateModelV2Factory} from "silo-core-v2/interfaces/IInterestRateModelV2Factory.sol";
 
 import {ChainlinkV3OracleFactory} from "silo-oracles-v2/chainlinkV3/ChainlinkV3OracleFactory.sol";
 import {IChainlinkV3Oracle, AggregatorV3Interface} from "silo-oracles-v2/interfaces/IChainlinkV3Oracle.sol";
 import {SiloDeployer} from "silo-core-v2/SiloDeployer.sol";
-import {SiloFactory} from "silo-core-v2/SiloFactory.sol";
 
 import {ArbitrumLib} from "./ArbitrumLib.sol";
 
@@ -23,37 +18,36 @@ contract DeploySilo {
         SiloDeployer _siloDeployer,
         address _hookImplementation,
         bytes memory _hookInitializationData
-    ) public returns (ISiloConfig siloConfig) {
-        // this is empty because deploying hook is handeled manually and final address is pass as argument
-        ISiloDeployer.ClonableHookReceiver memory _clonableHookReceiver;
-        _clonableHookReceiver.implementation = _hookImplementation;
-        _clonableHookReceiver.initializationData = _hookInitializationData;
+    ) external returns (ISiloConfig siloConfig) {
+        ISiloDeployer.ClonableHookReceiver memory _clonableHookReceiver = ISiloDeployer.ClonableHookReceiver({
+            implementation: _hookImplementation,
+            initializationData: _hookInitializationData
+        });
 
         siloConfig = _siloDeployer.deploy({
             _oracles: _oracles(),
             _irmConfigData0: _irmConfigData(),
             _irmConfigData1: _irmConfigData(),
             _clonableHookReceiver: _clonableHookReceiver,
-            _siloInitData: _siloInitData(address(0))
+            _siloInitData: _siloInitData()
         });
     }
 
     function _oracles() internal returns (ISiloDeployer.Oracles memory oracles) {
-        // Silo has two options to set oracles: for max LTV and solvency
+        // Silo has two options to set oracles: for maxLTV and solvency
         // if you want to set the same for both, set for solvency, it will be copied for maxLTV as well
-        // if you set only for maxLtvOracle it will throw error
-        // if you already have oracles deployed, you can set it directly in _irmConfigData()
+        // if you set only for maxLtvOracle it will throw error.
+        // if you already have oracles deployed, you can set it directly in _irmConfigData() and ignore this setup
         oracles.solvencyOracle0.factory = address(new ChainlinkV3OracleFactory());
+        oracles.solvencyOracle0.txInput = abi.encodeWithSelector(ChainlinkV3OracleFactory.create.selector, config);
 
         IChainlinkV3Oracle.ChainlinkV3DeploymentConfig memory config;
         config.baseToken = IERC20Metadata(ArbitrumLib.WETH);
         config.quoteToken = IERC20Metadata(ArbitrumLib.USDC);
         config.primaryAggregator = AggregatorV3Interface(ArbitrumLib.CHAINLINK_ETH_USD_AGREGATOR);
         config.primaryHeartbeat = 87001;
-        // config.normalizationDivider = 1e18;
         // this will normalize price to be in 6 decimals, so same decimals as quote asset (USDC)
         config.normalizationDivider = 1e20;
-        oracles.solvencyOracle0.txInput = abi.encodeWithSelector(ChainlinkV3OracleFactory.create.selector, config);
     }
 
     function _irmConfigData() internal pure returns (IInterestRateModelV2.Config memory irmConfigData) {
@@ -66,7 +60,7 @@ contract DeploySilo {
         irmConfigData.ri = 1744038559;
     }
 
-    function _siloInitData(address _hookReceiver) internal returns (ISiloConfig.InitData memory siloInitData) {
+    function _siloInitData() internal returns (ISiloConfig.InitData memory siloInitData) {
         siloInitData.deployer = msg.sender;
         siloInitData.deployerFee = 0;
         siloInitData.daoFee = 0.1e18;

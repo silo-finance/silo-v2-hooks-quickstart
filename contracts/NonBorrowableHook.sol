@@ -12,6 +12,7 @@ import {BaseHookReceiver} from "silo-core-v2/utils/hook-receivers/_common/BaseHo
 import {GaugeHookReceiver} from "silo-core-v2/utils/hook-receivers/gauge/GaugeHookReceiver.sol";
 import {PartialLiquidation} from "silo-core-v2/utils/hook-receivers/liquidation/PartialLiquidation.sol";
 
+/// @dev Example of hook, that prevents borrowing asset. Note: borrowing same asset is still available.
 contract NonBorrowableHook is GaugeHookReceiver, PartialLiquidation {
     error NonBorrowableHook_CanNotBorrowThisAsset();
     error NonBorrowableHook_WrongAssetForMarket();
@@ -52,13 +53,12 @@ contract NonBorrowableHook is GaugeHookReceiver, PartialLiquidation {
 
         nonBorrowableSilo = nonBorrowableSiloCached;
 
-        // do not remove this line if you want fully compatible functionality
+        // fetch current setup in case there were some hooks already implemented
         (uint256 hooksBefore, uint256 hooksAfter) = _hookReceiverConfig(nonBorrowableSiloCached);
 
         // your code here
         hooksBefore = Hook.addAction(hooksBefore, Hook.BORROW);
         _setHookConfig(nonBorrowableSiloCached, hooksBefore, hooksAfter);
-
     }
 
     /// @inheritdoc IHookReceiver
