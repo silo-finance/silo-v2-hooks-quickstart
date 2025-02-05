@@ -8,8 +8,6 @@ import {ISiloConfig} from "silo-core-v2/interfaces/ISiloConfig.sol";
 import {ISilo} from "silo-core-v2/interfaces/ISilo.sol";
 import {IShareToken, IERC20Metadata} from "silo-core-v2/interfaces/IShareToken.sol";
 import {IGaugeHookReceiver} from "silo-core-v2/interfaces/IGaugeHookReceiver.sol";
-import {ISiloDeployer} from "silo-core-v2/interfaces/ISiloDeployer.sol";
-import {IInterestRateModelV2} from "silo-core-v2/interfaces/IInterestRateModelV2.sol";
 
 import {SiloDeployer} from "silo-core-v2/SiloDeployer.sol";
 
