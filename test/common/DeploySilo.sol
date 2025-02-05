@@ -39,7 +39,6 @@ contract DeploySilo {
         // if you set only for maxLtvOracle it will throw error.
         // if you already have oracles deployed, you can set it directly in _irmConfigData() and ignore this setup
         oracles.solvencyOracle0.factory = address(new ChainlinkV3OracleFactory());
-        oracles.solvencyOracle0.txInput = abi.encodeWithSelector(ChainlinkV3OracleFactory.create.selector, config);
 
         IChainlinkV3Oracle.ChainlinkV3DeploymentConfig memory config;
         config.baseToken = IERC20Metadata(ArbitrumLib.WETH);
@@ -48,6 +47,8 @@ contract DeploySilo {
         config.primaryHeartbeat = 87001;
         // this will normalize price to be in 6 decimals, so same decimals as quote asset (USDC)
         config.normalizationDivider = 1e20;
+
+        oracles.solvencyOracle0.txInput = abi.encodeWithSelector(ChainlinkV3OracleFactory.create.selector, config);
     }
 
     function _irmConfigData() internal pure returns (IInterestRateModelV2.Config memory irmConfigData) {
