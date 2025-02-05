@@ -34,10 +34,10 @@ contract NonBorrowableHook is GaugeHookReceiver, PartialLiquidation {
         GaugeHookReceiver.__GaugeHookReceiver_init(owner);
         // --end of initialization--
 
-        _setupHooks(_siloConfig, nonBorrowableAsset);
+        __NonBorrowableHook_init(_siloConfig, nonBorrowableAsset);
     }
 
-    function _setupHooks(ISiloConfig _siloConfig, address _nonBorrowableAsset) internal {
+    function __NonBorrowableHook_init(ISiloConfig _siloConfig, address _nonBorrowableAsset) internal {
         require(_nonBorrowableAsset != address(0), NonBorrowableHook_AssetZero());
 
         (address silo0, address silo1) = _siloConfig.getSilos();
