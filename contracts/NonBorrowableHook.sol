@@ -34,26 +34,31 @@ contract NonBorrowableHook is GaugeHookReceiver, PartialLiquidation {
         GaugeHookReceiver.__GaugeHookReceiver_init(owner);
         // --end of initialization--
 
-        require(nonBorrowableAsset != address(0), NonBorrowableHook_AssetZero());
+        _setupHooks(_siloConfig, nonBorrowableAsset);
+    }
+
+    function _setupHooks(ISiloConfig _siloConfig, address _nonBorrowableAsset) internal {
+        require(_nonBorrowableAsset != address(0), NonBorrowableHook_AssetZero());
 
         (address silo0, address silo1) = _siloConfig.getSilos();
+        address nonBorrowableSiloCached;
 
-        if (ISilo(silo0).asset() == nonBorrowableAsset)
-            nonBorrowableSilo = silo0;
-        else if (ISilo(silo1).asset() == nonBorrowableAsset)
-            nonBorrowableSilo = silo1;
+        if (ISilo(silo0).asset() == _nonBorrowableAsset)
+            nonBorrowableSiloCached = silo0;
+        else if (ISilo(silo1).asset() == _nonBorrowableAsset)
+            nonBorrowableSiloCached = silo1;
         else
             revert NonBorrowableHook_WrongAssetForMarket();
 
-        _setupHooks(nonBorrowableAsset);
-    }
+        nonBorrowableSilo = nonBorrowableSiloCached;
 
-    function _setupHooks(address _silo) internal view returns (uint24 hooksBefore, uint24 hooksAfter) {
         // do not remove this line if you want fully compatible functionality
-        (hooksBefore, hooksAfter) = _hookReceiverConfig(_silo);
+        (uint256 hooksBefore, uint256 hooksAfter) = _hookReceiverConfig(nonBorrowableSiloCached);
 
         // your code here
-        hooksBefore = uint24(Hook.addAction(hooksBefore, Hook.BORROW));
+        hooksBefore = Hook.addAction(hooksBefore, Hook.BORROW);
+        _setHookConfig(nonBorrowableSiloCached, hooksBefore, hooksAfter);
+
     }
 
     /// @inheritdoc IHookReceiver
