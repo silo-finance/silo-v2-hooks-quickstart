@@ -61,24 +61,18 @@ contract DeploySilo {
         irmConfigData.ri = 1744038559;
     }
 
-    function _siloInitData() internal returns (ISiloConfig.InitData memory siloInitData) {
+    function _siloInitData() internal view returns (ISiloConfig.InitData memory siloInitData) {
         siloInitData.deployer = msg.sender;
         siloInitData.deployerFee = 0;
         siloInitData.daoFee = 0.1e18;
 
         siloInitData.token0 = ArbitrumLib.WETH;
-        (, IInterestRateModelV2 irm) = ArbitrumLib.INTEREST_RATE_MODEL_FACTORY.create(_irmConfigData());
-
-        siloInitData.interestRateModel0 = address(irm);
         siloInitData.maxLtv0 = 0.75e18;
         siloInitData.lt0 = 0.80e18;
         siloInitData.liquidationTargetLtv0 = 0.78e18;
         siloInitData.liquidationFee0 = 0.075e18;
 
         siloInitData.token1 = ArbitrumLib.USDC;
-        (, irm) = ArbitrumLib.INTEREST_RATE_MODEL_FACTORY.create(_irmConfigData());
-
-        siloInitData.interestRateModel1 = address(irm);
         siloInitData.maxLtv1 = 0.75e18;
         siloInitData.lt1 = 0.80e18;
         siloInitData.liquidationTargetLtv0 = 0.78e18;
