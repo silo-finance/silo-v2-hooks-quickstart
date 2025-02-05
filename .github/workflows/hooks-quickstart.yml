@@ -3,6 +3,9 @@
 
 name: Hooks Quality Test
 
+env:
+    RPC_ARBITRUM: ${{ secrets.RPC_ARBITRUM }}
+
 on:
     push:
         branches: [ master, develop ]

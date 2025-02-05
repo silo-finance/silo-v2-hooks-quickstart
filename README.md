@@ -23,15 +23,3 @@ $ git submodule update --init --recursive
 ```shell
 forge test
 ```
-
-### Initial steps to create this repository from scratch
-
-```shell
-git submodule add --name forge-std https://github.com/foundry-rs/forge-std gitmodules/forge-std
-git submodule add --name silo-contracts-v2 https://github.com/silo-finance/silo-contracts-v2 gitmodules/silo-contracts-v2
-
-forge update
-
-cd gitmodules/silo-contracts-v2
-git checkout <commit>
-```

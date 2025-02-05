@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.28;
 
 import {IHookReceiver} from "silo-core-v2/interfaces/IHookReceiver.sol";
 import {ISiloConfig} from "silo-core-v2/interfaces/ISiloConfig.sol";
@@ -57,7 +57,7 @@ contract BoilerplateHook is GaugeHookReceiver, PartialLiquidation {
     }
 
     /// @inheritdoc IHookReceiver
-    function beforeAction(address, uint256, bytes calldata) external {
+    function beforeAction(address, uint256, bytes calldata) external pure {
         // Silo does not use it, replace revert with your code if you want to use before hook
         revert RequestNotSupported();
 
