@@ -11,7 +11,6 @@ import {IGaugeHookReceiver} from "silo-core-v2/interfaces/IGaugeHookReceiver.sol
 import {ISiloDeployer} from "silo-core-v2/interfaces/ISiloDeployer.sol";
 import {IInterestRateModelV2} from "silo-core-v2/interfaces/IInterestRateModelV2.sol";
 
-import {ShareTokenLib} from "silo-core-v2/lib/ShareTokenLib.sol";
 import {SiloDeployer} from "silo-core-v2/SiloDeployer.sol";
 
 import {CollectedErrors} from "../contracts/errors/CollectedErrors.sol";
