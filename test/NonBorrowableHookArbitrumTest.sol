@@ -46,48 +46,46 @@ contract NonBorrowableHookArbitrumTest is Labels {
     }
 
     /*
-    forge test --mt test_nonBorrowableHook_twoAssets -vv
+    forge test --mt test_nonBorrowableHook_borrowUSDC -vv
     */
-    function test_nonBorrowableHook_USDC() public {
-        address user = makeAddr("user");
+    function test_nonBorrowableHook_borrowUSDC() public {
+        address depositor = makeAddr("depositor");
+        address borrower = makeAddr("borrower");
         (address wethSilo, address usdcSilo) = siloConfig.getSilos();
 
         uint256 depositAmount = 1e18;
 
-        vm.startPrank(ArbitrumLib.WETH_WHALE);
-        IERC20(ISilo(wethSilo).asset()).transfer(user, depositAmount);
-        vm.stopPrank();
+        // deposit liquidity
+        _getUSDC(depositor, 1e6);
+        _deposit(usdcSilo, depositor, 1e6);
 
-        vm.startPrank(user);
-        IERC20(ISilo(wethSilo).asset()).approve(wethSilo, depositAmount);
-        ISilo(wethSilo).deposit(depositAmount, user);
+        // borrow
+        _getWETH(borrower, 1e18);
+        _deposit(wethSilo, borrower, 1e18);
 
         vm.expectRevert(NonBorrowableHook.NonBorrowableHook_CanNotBorrowThisAsset.selector);
-        ISilo(usdcSilo).borrow(1, user, user);
-
-        vm.stopPrank();
+        vm.prank(borrower);
+        ISilo(usdcSilo).borrow(1, borrower, borrower);
     }
 
     /*
-    forge test --mt test_nonBorrowableHook_twoAssets -vv
+    forge test --mt test_nonBorrowableHook_borrowWETH -vv
     */
-    function test_nonBorrowableHook_WETH() public {
-        address user = makeAddr("user");
+    function test_nonBorrowableHook_borrowWETH() public {
+        address depositor = makeAddr("depositor");
+        address borrower = makeAddr("borrower");
         (address wethSilo, address usdcSilo) = siloConfig.getSilos();
 
-        uint256 depositAmount = 1e18;
+        // deposit liquidity
+        _getWETH(depositor, 1e18);
+        _deposit(wethSilo, depositor, 1e18);
 
-        vm.startPrank(ArbitrumLib.USDC_WHALE);
-        IERC20(ISilo(usdcSilo).asset()).transfer(user, depositAmount);
-        vm.stopPrank();
+        // add collateral
+        _getUSDC(borrower, 1e6);
+        _deposit(usdcSilo, borrower, 1e6);
 
-        vm.startPrank(user);
-        IERC20(ISilo(usdcSilo).asset()).approve(usdcSilo, depositAmount);
-        ISilo(usdcSilo).deposit(depositAmount, user);
-
-        ISilo(wethSilo).borrow(1, user, user);
-
-        vm.stopPrank();
+        vm.prank(borrower);
+        ISilo(wethSilo).borrow(1e10, borrower, borrower);
     }
 
     /*
@@ -126,6 +124,25 @@ contract NonBorrowableHookArbitrumTest is Labels {
 
         ISilo(_silo).borrowSameAsset(1, user, user);
 
+        vm.stopPrank();
+    }
+
+    function _getUSDC(address _user, uint256 _amount) internal {
+        vm.startPrank(ArbitrumLib.USDC_WHALE);
+        IERC20(ArbitrumLib.USDC).transfer(_user, _amount);
+        vm.stopPrank();
+    }
+
+    function _getWETH(address _user, uint256 _amount) internal {
+        vm.startPrank(ArbitrumLib.WETH_WHALE);
+        IERC20(ArbitrumLib.WETH).transfer(_user, _amount);
+        vm.stopPrank();
+    }
+
+    function _deposit(address _silo, address _user, uint256 _amount) internal {
+        vm.startPrank(_user);
+        IERC20(ISilo(_silo).asset()).approve(_silo, _amount);
+        ISilo(_silo).deposit(_amount, _user);
         vm.stopPrank();
     }
 }

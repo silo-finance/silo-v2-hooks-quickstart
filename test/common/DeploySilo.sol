@@ -42,16 +42,17 @@ contract DeploySilo {
         // if you want to set the same for both, set for solvency, it will be copied for maxLTV as well
         // if you set only for maxLtvOracle it will throw error
         // if you already have oracles deployed, you can set it directly in _irmConfigData()
-        oracles.solvencyOracle1.factory = address(new ChainlinkV3OracleFactory());
+        oracles.solvencyOracle0.factory = address(new ChainlinkV3OracleFactory());
 
         IChainlinkV3Oracle.ChainlinkV3DeploymentConfig memory config;
         config.baseToken = IERC20Metadata(ArbitrumLib.WETH);
         config.quoteToken = IERC20Metadata(ArbitrumLib.USDC);
         config.primaryAggregator = AggregatorV3Interface(ArbitrumLib.CHAINLINK_ETH_USD_AGREGATOR);
         config.primaryHeartbeat = 87001;
-        config.normalizationMultiplier = 1e10;
-
-        oracles.solvencyOracle1.txInput = abi.encodeWithSelector(ChainlinkV3OracleFactory.create.selector, config);
+        // config.normalizationDivider = 1e18;
+        // this will normalize price to be in 6 decimals, so same decimals as quote asset (USDC)
+        config.normalizationDivider = 1e20;
+        oracles.solvencyOracle0.txInput = abi.encodeWithSelector(ChainlinkV3OracleFactory.create.selector, config);
 
         console.log("_oracles setup end");
     }

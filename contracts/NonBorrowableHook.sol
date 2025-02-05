@@ -44,14 +44,11 @@ contract NonBorrowableHook is GaugeHookReceiver, PartialLiquidation {
             nonBorrowableSilo = silo1;
         else
             revert NonBorrowableHook_WrongAssetForMarket();
+
+        _setupHooks(nonBorrowableAsset);
     }
 
-    function hookReceiverConfig(address _silo)
-        external
-        view
-        override (BaseHookReceiver, IHookReceiver)
-        returns (uint24 hooksBefore, uint24 hooksAfter)
-    {
+    function _setupHooks(address _silo) internal view returns (uint24 hooksBefore, uint24 hooksAfter) {
         // do not remove this line if you want fully compatible functionality
         (hooksBefore, hooksAfter) = _hookReceiverConfig(_silo);
 
