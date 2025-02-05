@@ -33,8 +33,6 @@ contract DeploySilo {
             _clonableHookReceiver: _clonableHookReceiver,
             _siloInitData: _siloInitData(_hook)
         });
-
-        console.log("_siloDeployer.deploy end");
     }
 
     function _oracles() internal returns (ISiloDeployer.Oracles memory oracles) {
@@ -53,11 +51,9 @@ contract DeploySilo {
         // this will normalize price to be in 6 decimals, so same decimals as quote asset (USDC)
         config.normalizationDivider = 1e20;
         oracles.solvencyOracle0.txInput = abi.encodeWithSelector(ChainlinkV3OracleFactory.create.selector, config);
-
-        console.log("_oracles setup end");
     }
 
-    function _irmConfigData() internal returns (IInterestRateModelV2.Config memory irmConfigData) {
+    function _irmConfigData() internal pure returns (IInterestRateModelV2.Config memory irmConfigData) {
         irmConfigData.uopt = 900000000000000001;
         irmConfigData.ucrit = 900000000000000002;
         irmConfigData.ulow = 900000000000000000;
@@ -65,8 +61,6 @@ contract DeploySilo {
         irmConfigData.klow = 1937820621;
         irmConfigData.beta = 11574074074074;
         irmConfigData.ri = 1744038559;
-
-        console.log("_irmConfigData() end");
     }
 
     function _siloInitData(address _hookReceiver) internal returns (ISiloConfig.InitData memory siloInitData) {
@@ -92,7 +86,5 @@ contract DeploySilo {
         siloInitData.lt1 = 0.80e18;
         siloInitData.liquidationTargetLtv0 = 0.78e18;
         siloInitData.liquidationFee0 = 0.075e18;
-
-        console.log("_siloInitData() end");
     }
 }

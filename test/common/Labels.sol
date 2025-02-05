@@ -20,7 +20,6 @@ contract Labels is Test {
         vm.label(address(_siloConfig), string.concat("siloConfig"));
 
         (address silo0, address silo1) = _siloConfig.getSilos();
-        ISiloConfig.ConfigData memory config = _siloConfig.getConfig(silo0);
 
         _labels(_siloConfig, silo0, "0");
         _labels(_siloConfig, silo1, "1");
