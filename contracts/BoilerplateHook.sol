@@ -7,6 +7,20 @@ import {BaseHookReceiver} from "silo-core-v2/utils/hook-receivers/_common/BaseHo
 import {GaugeHookReceiver} from "silo-core-v2/utils/hook-receivers/gauge/GaugeHookReceiver.sol";
 import {PartialLiquidation} from "silo-core-v2/utils/hook-receivers/liquidation/PartialLiquidation.sol";
 
+/// @title Boilerplate hook for developers
+/// @dev
+/// `GaugeHookReceiver` - is a hook that allows to set incentives for a Silo market retroactively
+/// `PartialLiquidation` - implements partial liquidation logic for the Silo market
+///     !!! If `PartialLiquidation` is removed Silo will not have liquidation functionality. !!!
+/// Developers can remove or replace any of the inherited contracts or add new ones.
+/// It is important to understand that the hooks in the Silo protocol are very flexible/powerful
+/// and can be combined in any way. These two hooks are a good example of how developers can use hooks
+/// to implement custom logic. As the `GaugeHookReceiver` is designed to receive notifications from the Silo protocol,
+/// while `PartialLiquidation` do not receive any notifications, but is using hook to extend Silo functionality
+/// with partial liquidation logic. So, you, as a developer, can receive notifications before/after each action
+/// in the Silo (this is what we do in the GaugeHookReceiver), which opens the possibility to execute a custom logic
+/// whenever users interact with the Silo market, or you can extend Silo with a new functionality creating new methods
+/// via your custom hook (this is what we do in the PartialLiquidation).
 contract BoilerplateHook is GaugeHookReceiver, PartialLiquidation {
     /// @dev this method is mandatory and it has to initialize inherited contracts
     /// @inheritdoc IHookReceiver
