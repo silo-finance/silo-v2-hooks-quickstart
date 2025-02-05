@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.10;
+pragma solidity ^0.8.28;
 
 import {IHookReceiver} from "silo-core-v2/interfaces/IHookReceiver.sol";
 import {ISiloConfig} from "silo-core-v2/interfaces/ISiloConfig.sol";
