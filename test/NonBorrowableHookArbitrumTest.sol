@@ -122,9 +122,8 @@ contract NonBorrowableHookArbitrumTest is Labels {
     }
 
     function _getWETH(address _user, uint256 _amount) internal {
-        vm.startPrank(ArbitrumLib.WETH_WHALE);
+        vm.prank(ArbitrumLib.WETH_WHALE);
         IERC20(ArbitrumLib.WETH).transfer(_user, _amount);
-        vm.stopPrank();
     }
 
     function _deposit(address _silo, address _user, uint256 _amount) internal {
