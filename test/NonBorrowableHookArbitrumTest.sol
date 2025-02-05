@@ -36,11 +36,14 @@ contract NonBorrowableHookArbitrumTest is Labels {
 
         DeploySilo deployer = new DeploySilo();
 
-        clonedHook = NonBorrowableHook(Clones.clone(address(new NonBorrowableHook())));
-        siloConfig = deployer.deploySilo(ArbitrumLib.SILO_DEPLOYER, address(clonedHook));
+        siloConfig = deployer.deploySilo(
+            ArbitrumLib.SILO_DEPLOYER,
+            address(new NonBorrowableHook()),
+            // NOTICE: do not use encodePacked
+            abi.encode(address(this), ArbitrumLib.USDC)
+        );
 
-        // NOTICE: do not use encodePacked
-        clonedHook.initialize(siloConfig, abi.encode(address(this), ArbitrumLib.USDC));
+        clonedHook = NonBorrowableHook(_getHookAddress(siloConfig));
 
         _setLabels(siloConfig);
     }
@@ -135,5 +138,12 @@ contract NonBorrowableHookArbitrumTest is Labels {
         IERC20(ISilo(_silo).asset()).approve(_silo, _amount);
         ISilo(_silo).deposit(_amount, _user);
         vm.stopPrank();
+    }
+
+    function _getHookAddress(ISiloConfig _siloConfig) internal returns (address hook) {
+        (address silo, ) = _siloConfig.getSilos();
+
+        ISiloConfig.ConfigData memory config = _siloConfig.getConfig(silo);
+        hook = config.hookReceiver;
     }
 }

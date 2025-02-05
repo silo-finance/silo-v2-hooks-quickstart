@@ -21,17 +21,20 @@ import {ArbitrumLib} from "./ArbitrumLib.sol";
 contract DeploySilo {
     function deploySilo(
         SiloDeployer _siloDeployer,
-        address _hook
+        address _hookImplementation,
+        bytes memory _hookInitializationData
     ) public returns (ISiloConfig siloConfig) {
         // this is empty because deploying hook is handeled manually and final address is pass as argument
         ISiloDeployer.ClonableHookReceiver memory _clonableHookReceiver;
+        _clonableHookReceiver.implementation = _hookImplementation;
+        _clonableHookReceiver.initializationData = _hookInitializationData;
 
         siloConfig = _siloDeployer.deploy({
             _oracles: _oracles(),
             _irmConfigData0: _irmConfigData(),
             _irmConfigData1: _irmConfigData(),
             _clonableHookReceiver: _clonableHookReceiver,
-            _siloInitData: _siloInitData(_hook)
+            _siloInitData: _siloInitData(address(0))
         });
     }
 
@@ -65,7 +68,6 @@ contract DeploySilo {
 
     function _siloInitData(address _hookReceiver) internal returns (ISiloConfig.InitData memory siloInitData) {
         siloInitData.deployer = msg.sender;
-        siloInitData.hookReceiver = _hookReceiver;
         siloInitData.deployerFee = 0;
         siloInitData.daoFee = 0.1e18;
 
