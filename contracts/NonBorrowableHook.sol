@@ -63,11 +63,10 @@ contract NonBorrowableHook is GaugeHookReceiver, PartialLiquidation {
 
     /// @inheritdoc IHookReceiver
     function beforeAction(address _silo, uint256 _action, bytes calldata) external view {
-        if (!Hook.matchAction(_action, Hook.BORROW)) {
-            // Silo does not use it, replace revert with your code if you want to use before hook
-            revert RequestNotSupported();
+        if (Hook.matchAction(_action, Hook.BORROW)) {
+            require(_silo != nonBorrowableSilo, NonBorrowableHook_CanNotBorrowThisAsset());
         }
 
-        require(_silo != nonBorrowableSilo, NonBorrowableHook_CanNotBorrowThisAsset());
+        
     }
 }
