@@ -55,6 +55,11 @@ contract NonBorrowableHook is GaugeHookReceiver, PartialLiquidation {
         (uint256 hooksBefore, uint256 hooksAfter) = _hookReceiverConfig(nonBorrowableSiloCached);
 
         // your code here
+        //
+        // It is recommended to use `addAction` and `removeAction` when working with hook.
+        // It is expected that hooks bitmap will store settings for multiple hooks and utility
+        // functions like `addAction` and `removeAction` will make sure to not override
+        // other hooks' settings.
         hooksBefore = Hook.addAction(hooksBefore, Hook.BORROW);
         _setHookConfig(nonBorrowableSiloCached, hooksBefore, hooksAfter);
     }
